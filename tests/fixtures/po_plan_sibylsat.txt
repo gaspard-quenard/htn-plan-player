@@ -1,0 +1,11 @@
+==>
+72 slice bread1
+75 toast bread1
+66 grind arabica
+69 brew arabica cup1
+root 19
+19 breakfast cup1 bread1 -> m-breakfast 33 35 98
+33 make-coffee cup1 -> m-coffee 66 69
+35 make-toast bread1 -> m-toast 72 75
+98 tidy -> m-tidy-nothing
+<==

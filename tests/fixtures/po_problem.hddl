@@ -1,0 +1,7 @@
+(define (problem morning)
+  (:domain kitchen)
+  (:objects cup1 - cup arabica - beans bread1 - bread)
+  (:htn :parameters () :subtasks (and (task0 (breakfast cup1 bread1))))
+  (:init (has-beans arabica))
+  (:goal (and (coffee cup1) (toasted bread1)))
+)

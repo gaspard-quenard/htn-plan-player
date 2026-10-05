@@ -1,0 +1,59 @@
+;; Tiny partial-order HTN domain used by the viewer tests.
+;; Coffee and toast are unordered (they may interleave); tidying comes last.
+(define (domain kitchen)
+  (:requirements :typing :hierarchy :negative-preconditions)
+  (:types cup beans bread - object)
+  (:predicates (ground ?b - beans) (coffee ?c - cup) (sliced ?b - bread)
+               (toasted ?b - bread) (has-beans ?b - beans) (clean) (dirty))
+
+  (:task breakfast :parameters (?c - cup ?br - bread))
+  (:task make-coffee :parameters (?c - cup))
+  (:task make-toast :parameters (?br - bread))
+  (:task tidy :parameters ())
+
+  (:method m-breakfast
+    :parameters (?c - cup ?br - bread)
+    :task (breakfast ?c ?br)
+    :subtasks (and (c (make-coffee ?c)) (t (make-toast ?br)) (s (tidy)))
+    :ordering (and (< c s) (< t s)))
+
+  (:method m-coffee
+    :parameters (?c - cup ?b - beans)
+    :task (make-coffee ?c)
+    :precondition (has-beans ?b)
+    :ordered-subtasks (and (grind ?b) (brew ?b ?c)))
+
+  (:method m-toast
+    :parameters (?br - bread)
+    :task (make-toast ?br)
+    :ordered-subtasks (and (slice ?br) (toast ?br)))
+
+  (:method m-tidy-nothing
+    :parameters ()
+    :task (tidy)
+    :precondition (not (dirty))
+    :subtasks ())
+
+  (:method m-tidy-wipe
+    :parameters ()
+    :task (tidy)
+    :precondition (dirty)
+    :subtasks (and (wipe)))
+
+  (:action grind :parameters (?b - beans)
+    :precondition (has-beans ?b)
+    :effect (and (ground ?b) (not (has-beans ?b))))
+  (:action brew :parameters (?b - beans ?c - cup)
+    :precondition (ground ?b)
+    :effect (and (coffee ?c) (not (ground ?b))))
+  (:action slice :parameters (?br - bread)
+    :precondition (not (sliced ?br))
+    :effect (sliced ?br))
+  (:action toast :parameters (?br - bread)
+    :precondition (sliced ?br)
+    :effect (and (toasted ?br)
+                 (forall (?b - beans) (when (ground ?b) (clean)))))
+  (:action wipe :parameters ()
+    :precondition (dirty)
+    :effect (and (clean) (not (dirty))))
+)

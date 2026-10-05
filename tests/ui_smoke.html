@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>HTN Plan Player UI smoke test</title>
+  <style>body { font: 14px system-ui, sans-serif; margin: 16px; } iframe { width: 1300px; height: 750px; border: 1px solid #ccc; } .fail { color: #c00; } .pass { color: #080; }</style>
+</head>
+<body>
+  <!-- Serve the parent folder over HTTP (python3 -m http.server) and open
+       htn_viewer/tests/ui_smoke.html; it drives the viewer in an iframe. -->
+  <pre id="out">running…</pre>
+  <iframe id="app" src="../index.html?plan=tests/fixtures/to_plan_sibylsat.log&domain=tests/fixtures/to_domain.hddl&problem=tests/fixtures/to_problem.hddl"></iframe>
+  <script>
+    'use strict';
+    const out = document.getElementById('out');
+    const results = [];
+    const check = (cond, msg) => results.push((cond ? 'PASS ' : 'FAIL ') + msg);
+    const wait = ms => new Promise(r => setTimeout(r, ms));
+    async function until(fn, ms = 4000) {
+      const t0 = Date.now();
+      while (Date.now() - t0 < ms) { if (fn()) return true; await wait(50); }
+      return false;
+    }
+
+    document.getElementById('app').addEventListener('load', async () => {
+      const w = document.getElementById('app').contentWindow;
+      const d = w.document;
+      const errors = [];
+      w.addEventListener('error', e => errors.push(e.message));
+      w.addEventListener('unhandledrejection', e => errors.push(String(e.reason)));
+      const $ = s => d.querySelector(s);
+      const key = (k, opts = {}) => w.dispatchEvent(new w.KeyboardEvent('keydown', Object.assign({ key: k, bubbles: true }, opts)));
+      const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
+      const dbl = el => el.dispatchEvent(new w.MouseEvent('dblclick', { bubbles: true }));
+      const label = () => $('#step-label').textContent;
+      const nodes = () => d.querySelectorAll('g.n').length;
+      try {
+        check(await until(() => d.body.classList.contains('loaded')), 'plan loaded from URL');
+        check(label() === 'Step 1 / 13', 'starts at step 1 (' + label() + ')');
+        for (let i = 0; i < 5; i++) key('ArrowRight');
+        check(label() === 'Step 6 / 13', 'arrow keys step (' + label() + ')');
+        key('Home');
+        key('ArrowRight', { shiftKey: true });
+        check(label() === 'Step 11 / 13', 'shift+arrow jumps 10 (' + label() + ')');
+        key('End');
+        check(label() === 'End · 13 steps' && /Plan complete/.test($('#crumbs').textContent), 'end of plan');
+        key('Home');
+        check(d.querySelector('g.n.current') && d.querySelector('g.n.current').dataset.id === '52', 'current action highlighted');
+        check(d.querySelectorAll('g.n.s-done[data-kind="action"]').length === 0, 'no action done at step 1');
+
+        key(' ');
+        await wait(1300);
+        key(' ');
+        const k = Number(label().split(' ')[1]);
+        check(k >= 2 && k <= 5, 'play advances then pauses (' + label() + ')');
+        check(d.querySelectorAll('g.n.s-done').length > 0, 'done nodes after playing');
+
+        click(d.querySelector('g.n[data-id="79"] .box'));
+        check($('#details .d-title').textContent === 'drop', 'click selects a node');
+        check(/carrying r1 p1/.test($('#details').textContent), 'details show grounded precondition');
+        click(d.querySelector('g.n[data-id="14/m"] .box'));
+        check(d.querySelectorAll('#details .order-svg g.ord').length === 4 && d.querySelectorAll('#details .ord-edge').length === 3, 'ordering diagram: 4 subtasks in a chain');
+        click(d.querySelector('#details .order-svg g.ord.clickable'));
+        check($('#details .d-title').textContent === 'goto', 'clicking a box in the ordering diagram selects the subtask');
+
+        click(d.querySelector('g.n[data-id="199"] tspan.arg[data-obj="p2"]'));
+        check($('#highlight').value === 'p2' && /match/.test($('#hl-count').textContent), 'clicking an argument highlights the object (' + $('#hl-count').textContent + ')');
+        check(d.querySelector('svg.highlighting') && d.querySelectorAll('g.n.hl').length >= 3, 'matching nodes marked');
+        key('Escape');
+        check(!d.querySelector('svg.highlighting') && !$('#details .d-args'), 'Escape clears highlight and selection');
+
+        const before = nodes();
+        dbl(d.querySelector('g.n[data-id="23"] .box'));
+        check(nodes() < before && d.querySelector('g.n[data-id="23"] .badge'), `double-click collapses (${before} -> ${nodes()})`);
+        click(d.querySelector('g.n[data-id="23"] .badge'));
+        check(nodes() === before, 'badge click expands again');
+
+        const opt = id => { const b = $('#opt-' + id); b.checked = !b.checked; b.dispatchEvent(new w.Event('change')); };
+        opt('focus');
+        check(nodes() < before, `focus mode collapses inactive parts (${before} -> ${nodes()})`);
+        opt('focus');
+        key('m');
+        check(!d.querySelector('g.n[data-kind="method"]') && d.querySelector('g.n text.via'), 'methods merged into tasks');
+        key('m');
+        check(d.querySelector('g.n[data-kind="method"]'), 'methods shown again');
+        key('o');
+        check($('#orient-td').classList.contains('on'), 'orientation toggled to top-down');
+        key('o');
+
+        click(d.querySelector('.tabs button[data-tab="state"]'));
+        check(!$('#state').hidden && d.querySelectorAll('#state details.group').length > 3, 'world state tab lists facts');
+        for (let i = 0; i < 3; i++) key('ArrowRight');
+        check(d.querySelectorAll('#state .fact.add, #state .fact.del').length > 0 || /changes/i.test($('#state').textContent), 'state shows changes of the current step');
+
+        key('Home');
+        check(d.querySelectorAll('.tl-block').length === 13 && d.querySelector('.tl-block.current'), 'timeline shows every action, current one marked');
+        click(d.querySelectorAll('.tl-block')[4]);
+        check(label() === 'Step 5 / 13' && $('#details .d-title').textContent === 'drop', 'clicking a timeline block jumps to it (' + label() + ')');
+        key('t');
+        check(d.body.classList.contains('no-timeline') && !$('#opt-timeline').checked, 'T hides the timeline');
+        key('t');
+        key('m');
+        check(!$('#opt-methods').checked, 'M keeps the View menu checkbox in sync');
+        key('m');
+        key('Home');
+
+        click(d.querySelector('.crumb'));
+        check($('#details .d-title').textContent === 'deliver-all', 'breadcrumb selects the root task');
+        click(d.querySelector('#details .link'));
+        check(label() === 'Step 1 / 13', 'go there jumps to the node start');
+
+        click($('#btn-close'));
+        check(!d.body.classList.contains('loaded') && getComputedStyle($('.welcome')).display !== 'none', 'Close returns to the welcome screen');
+        check(w.localStorage.getItem('htnv.files') === null && !/plan=/.test(w.location.search), 'Close forgets the files');
+        check(d.querySelectorAll('g.n').length === 0 && d.querySelectorAll('.tl-block').length === 0, 'tree and timeline emptied');
+        key('ArrowRight');
+        click(d.querySelectorAll('#w-examples button')[1]);
+        check(d.body.classList.contains('loaded') && $('#step-label').textContent === 't = 0 / 4', 'example with durations loads after closing (' + $('#step-label').textContent + ')');
+      } catch (e) {
+        results.push('FAIL threw ' + e.stack);
+      }
+      check(errors.length === 0, 'no page errors ' + errors.join(' | '));
+      const failed = results.filter(r => r.startsWith('FAIL')).length;
+      out.textContent = results.join('\n') + `\n\nSUMMARY ${results.length - failed} passed, ${failed} failed`;
+      out.className = failed ? 'fail' : 'pass';
+      document.title = failed ? 'FAILED' : 'PASSED';
+    });
+  </script>
+</body>
+</html>

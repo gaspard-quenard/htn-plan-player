@@ -1,0 +1,13 @@
+(define (problem three-packages)
+  (:domain delivery)
+  (:objects r1 - robot
+            p1 p2 p3 - package
+            depot a b c - location)
+  (:htn :parameters () :ordered-subtasks (and (task0 (deliver-all r1))))
+  (:init (at r1 depot)
+         (road depot a) (road a depot) (road a b) (road b a) (road b c) (road c b)
+         (pkg-at p1 depot) (destination p1 c)
+         (pkg-at p2 c) (destination p2 a)
+         (pkg-at p3 a) (destination p3 b))
+  (:goal (and (reported r1)))
+)

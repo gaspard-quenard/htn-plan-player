@@ -1,0 +1,214 @@
+pandaPIparser is configured as follows
+  Colors in output: true
+  Mode: parsing mode
+  Parameter splitting: true
+  Conditional effects: exponential encoding
+  Disjunctive preconditions as HTN: false
+  Replace goal with action: false
+  Output: pandaPI format
+Parsing to_domain.hddl
+Parsing to_problem.hddl
+General Options
+  Print timings: false
+  Quiet mode: false
+Inference Options
+  H2 mutexes: false
+  FAM groups: true
+  Exit after FAM groups: true
+  FAM groups output file: <planner>/ProblemProcessing/lfg.txt
+Transformation Options
+  Add zero-cost no-op to empty methods: true
+  Remove duplicate actions: true
+  Remove useless literals: true
+  Expand abstract tasks with one method: true
+  Remove empty method preconditions: true
+  Two regularisation: false
+  Compile negative SAS variables: false
+Runtime Optimisations
+  Hierarchy Typing: true
+  Future Caching: false
+  Static Precondition Checking: false
+Output Options
+  Panda planner format: true
+  HDDL: false
+  SAS for Fast Downward (without hierarchy): false
+Output Formatting Options
+  Output only SAS+ variables: false
+  SAS+ delete mode: as input
+Reading input from <planner>/ProblemProcessing/problem.parsed.
+Writing output to standard output.
+Writing output to standard output.
+Parsing done.
+ It is used...
+ It is used...
+ It is used...
+Computing Lifted FAM-Groups [Fiser, AAAI 2020]
+Found 9 Lifted FAM-Groups
+Writing invariants to <planner>/ProblemProcessing/lfg.txt
+[39m:'[32m######[36m::'[32m####[36m:'[32m########[36m::'[32m##[36m:::'[32m##[36m:'[32m##[36m::::::::'[32m######[36m:::::'[32m###[36m::::'[32m########[36m: 
+'[32m##[36m... [32m##[36m:. [32m##[36m:: [32m##[36m.... [32m##[36m:. [32m##[36m:'[32m##[36m:: [32m##[36m:::::::'[32m##[36m... [32m##[36m:::'[32m##[36m [32m##[36m:::... [32m##[36m..:: 
+ [32m##[36m:::..::: [32m##[36m:: [32m##[36m:::: [32m##[36m::. [32m####[36m::: [32m##[36m::::::: [32m##[36m:::..:::'[32m##[36m:. [32m##[36m::::: [32m##[36m:::: 
+. [32m######[36m::: [32m##[36m:: [32m########[36m::::. [32m##[36m:::: [32m##[36m:::::::. [32m######[36m::'[32m##[36m:::. [32m##[36m:::: [32m##[36m:::: 
+:..... [32m##[36m:: [32m##[36m:: [32m##[36m.... [32m##[36m:::: [32m##[36m:::: [32m##[36m::::::::..... [32m##[36m: [32m#########[36m:::: [32m##[36m:::: 
+'[32m##[36m::: [32m##[36m:: [32m##[36m:: [32m##[36m:::: [32m##[36m:::: [32m##[36m:::: [32m##[36m:::::::'[32m##[36m::: [32m##[36m: [32m##[36m.... [32m##[36m:::: [32m##[36m:::: 
+. [32m######[36m::'[32m####[36m: [32m########[36m::::: [32m##[36m:::: [32m########[36m:. [32m######[36m:: [32m##[36m:::: [32m##[36m:::: [32m##[36m:::: 
+:......:::....::........::::::..:::::........:::......:::..:::::..:::::..::::: 
+[39m[34mS i b y l S a t[39m[34m  version rls-cadical
+[39m[34mby Gaspard Quenard <gaspard.quenard@univ-grenoble-alpes.fr> 2023-2024
+[39m[34mbased on a fork of the Lilotane planner by Dominik Schreiber <dominik.schreiber@kit.edu>
+[39m[34musing SAT solver cadical
+[39m[34m
+[39m[90m0.003 [39m[97mRewrite consecutive primitive tasks in method task networks into macro actions.
+[39m[90m0.003 [39m[97mCreated 0 macro actions.
+[39m[90m0.003 [39m[97m11 operators and 6 methods created.
+[39m[90m0.003 [39m[97mGrounder command: '<planner>/lib/grounder/pandaPIgrounder' --no-literal-pruning --only-write-state-features --quick-compute-state-features --quiet '<planner>/ProblemProcessing/problem.parsed' '<planner>/ProblemProcessing/problem.sas'
+[39m[90m0.003 [39m[97mGrounding the parsed problem...
+[39m[90m0.006 [39m[97mDone!
+[39m[90m0.006 [39m[97mReading ground state features...
+[39m[90m0.006 [39m[97mThere are 26 positive state features (which can also be negative) for this problem.
+[39m[90m0.006 [39m[97mThere are 26 negative state features for this problem.
+[39m[90m0.006 [39m[97mDone!
+[39m[90m0.006 [39m[97mFound 0 exclusive negative facts.
+[39m[90m0.006 [39m[97mGrounding time: 0.002 s
+[39m[90m0.006 [39m[97mComputing lifted mutex groups.
+[39m[90m0.007 [39m[97mLoading and grounding lifted mutex groups.
+[39m[90m0.007 [39m[97mInferred 3 method preconditions (+50.0%).
+[39m[90m0.008 [39m[97mIteration 0.
+[39m[90m0.008 [39m[97mCreating the initial root method
+[39m[90m0.008 [39m[97mCollected 0 relevant facts at this expansion iteration
+[39m[90m0.008 [39m[97mEncoding ...
+[39m[90m0.008 [39m[97mFrontier size: 1
+[39m[90m0.008 [39m[97mIteration 1.
+[39m[90m0.008 [39m[97mNew leaf count: 2
+[39m[90m0.008 [39m[97mInstantiating ...
+[39m[90m0.008 [39m[97mCollected 1 relevant facts at this expansion iteration
+[39m[90m0.008 [39m[97mEncoding ...
+[39m[90m0.008 [39m[97mFrontier size: 2
+[39m[90m0.008 [39m[97mAttempting to solve formula with 17 clauses (31 literals) and 1 assumptions
+[39m[90m0.008 [39m[97mFailed to find a primitive solution... Trying to find an abstract plan...
+[39m[90m0.008 [39m[97mAttempting to solve formula with 17 clauses (31 literals) and 0 assumptions
+[39m[90m0.008 [39m[97mFound an abstract plan
+[39m[90m0.008 [39m[97mNumber of leaves to develop: 1
+[39m[90m0.008 [39m[97mIteration 2.
+[39m[90m0.008 [39m[97mNew leaf count: 3
+[39m[90m0.008 [39m[97mInstantiating ...
+[39m[90m0.008 [39m[97mCollected 4 relevant facts at this expansion iteration
+pandaPIparser is configured as follows
+  Colors in output: true
+  Mode: convert pandaPI plan
+[39m[90m0.008 [39m[97mEncoding ...
+[39m[90m0.008 [39m[97mFrontier size: 3
+[39m[90m0.008 [39m[97mAttempting to solve formula with 85 clauses (206 literals) and 2 assumptions
+[39m[90m0.008 [39m[97mFailed to find a primitive solution... Trying to find an abstract plan...
+[39m[90m0.008 [39m[97mAttempting to solve formula with 85 clauses (206 literals) and 0 assumptions
+[39m[90m0.008 [39m[97mFound an abstract plan
+[39m[90m0.008 [39m[97mNumber of leaves to develop: 2
+[39m[90m0.008 [39m[97mIteration 3.
+[39m[90m0.008 [39m[97mNew leaf count: 7
+[39m[90m0.008 [39m[97mInstantiating ...
+[39m[90m0.008 [39m[97mCollected 17 relevant facts at this expansion iteration
+[39m[90m0.008 [39m[97mEncoding ...
+[39m[90m0.008 [39m[97mFrontier size: 7
+[39m[90m0.009 [39m[97mAttempting to solve formula with 483 clauses (1298 literals) and 4 assumptions
+[39m[90m0.009 [39m[97mFailed to find a primitive solution... Trying to find an abstract plan...
+[39m[90m0.009 [39m[97mAttempting to solve formula with 483 clauses (1298 literals) and 0 assumptions
+[39m[90m0.009 [39m[97mFound an abstract plan
+[39m[90m0.009 [39m[97mNumber of leaves to develop: 4
+[39m[90m0.009 [39m[97mIteration 4.
+[39m[90m0.009 [39m[97mNew leaf count: 13
+[39m[90m0.009 [39m[97mInstantiating ...
+[39m[90m0.009 [39m[97mCollected 17 relevant facts at this expansion iteration
+[39m[90m0.009 [39m[97mEncoding ...
+[39m[90m0.009 [39m[97mFrontier size: 13
+[39m[90m0.010 [39m[97mAttempting to solve formula with 1134 clauses (3125 literals) and 6 assumptions
+[39m[90m0.010 [39m[97mFailed to find a primitive solution... Trying to find an abstract plan...
+[39m[90m0.010 [39m[97mAttempting to solve formula with 1134 clauses (3125 literals) and 0 assumptions
+[39m[90m0.010 [39m[97mFound an abstract plan
+[39m[90m0.010 [39m[97mNumber of leaves to develop: 4
+[39m[90m0.010 [39m[97mIteration 5.
+[39m[90m0.010 [39m[97mNew leaf count: 19
+[39m[90m0.010 [39m[97mInstantiating ...
+[39m[90m0.010 [39m[97mCollected 17 relevant facts at this expansion iteration
+[39m[90m0.010 [39m[97mEncoding ...
+[39m[90m0.010 [39m[97mFrontier size: 19
+[39m[90m0.010 [39m[97mAttempting to solve formula with 1848 clauses (5135 literals) and 7 assumptions
+[39m[90m0.011 [39m[97mFailed to find a primitive solution... Trying to find an abstract plan...
+[39m[90m0.011 [39m[97mAttempting to solve formula with 1848 clauses (5135 literals) and 0 assumptions
+[39m[90m0.011 [39m[97mFound an abstract plan
+[39m[90m0.011 [39m[97mNumber of leaves to develop: 5
+[39m[90m0.011 [39m[97mIteration 6.
+[39m[90m0.011 [39m[97mNew leaf count: 24
+[39m[90m0.011 [39m[97mInstantiating ...
+[39m[90m0.011 [39m[97mCollected 17 relevant facts at this expansion iteration
+[39m[90m0.011 [39m[97mEncoding ...
+[39m[90m0.011 [39m[97mFrontier size: 24
+[39m[90m0.011 [39m[97mAttempting to solve formula with 2653 clauses (7436 literals) and 7 assumptions
+[39m[90m0.012 [39m[97mFound a solution after 4 expansion iterations.
+[39m[34m==>
+52 pick-up r1 p1 depot
+160 move r1 depot a
+283 move r1 a b
+424 move r1 b c
+79 drop r1 p1 c
+199 pick-up r1 p2 c
+338 move r1 c b
+481 move r1 b a
+233 drop r1 p2 a
+379 pick-up r1 p3 a
+537 move r1 a b
+413 drop r1 p3 b
+255 report-done r1
+root 4
+4 deliver-all r1 -> m-deliver-next 14 23
+14 deliver r1 p1 -> m-deliver 50 52 58 79
+23 deliver-all r1 -> m-deliver-next 86 107
+50 goto r1 depot -> m-goto-here
+58 goto r1 c -> m-goto-step 160 163
+86 deliver r1 p2 -> m-deliver 187 199 209 233
+107 deliver-all r1 -> m-deliver-next 242 543
+163 goto r1 c -> m-goto-step 283 288
+187 goto r1 c -> m-goto-here
+209 goto r1 a -> m-goto-step 338 342
+242 deliver r1 p3 -> m-deliver 367 379 389 413
+288 goto r1 c -> m-goto-step 424 427
+342 goto r1 a -> m-goto-step 481 486
+367 goto r1 a -> m-goto-here
+389 goto r1 b -> m-goto-step 537 542
+427 goto r1 c -> m-goto-here
+486 goto r1 a -> m-goto-here
+542 goto r1 b -> m-goto-here
+543 deliver-all r1 -> m-deliver-finished 255
+[39m[34m<==
+[39m[90m0.013 [39m[97mEnd of solution plan. (counted length of 13)
+[39m[90m0.013 [39m[97m# expansion iterations: 7
+[39m[90m0.013 [39m[97m# instantiated positions: 41
+[39m[90m0.013 [39m[97m# instantiated actions: 63
+[39m[90m0.013 [39m[97m# instantiated reductions: 40
+[39m[90m0.013 [39m[97m# introduced pseudo-constants: 40
+[39m[90m0.013 [39m[97m# retroactive prunings: 0
+[39m[90m0.013 [39m[97m# retroactively pruned operations: 0
+[39m[90m0.013 [39m[97m# dominated operations: 0
+[39m[90m0.013 [39m[97mEnd after result 0
+[39m[90m0.013 [39m[97mTotal amount of clauses encoded: 2653
+[39m[90m0.013 [39m[97m- direct frame axioms : 504 cls
+[39m[90m0.013 [39m[97m- Q-constant equality : 498 cls
+[39m[90m0.013 [39m[97m- Q-fact semantics : 319 cls
+[39m[90m0.013 [39m[97m- reduction constraints : 308 cls
+[39m[90m0.013 [39m[97m- indirect frame axioms : 204 cls
+[39m[90m0.013 [39m[97m- mutex constraints : 177 cls
+[39m[90m0.013 [39m[97m- substitution constraints : 176 cls
+[39m[90m0.013 [39m[97m- predecessor constraints : 102 cls
+[39m[90m0.013 [39m[97m- expansion constraints : 96 cls
+[39m[90m0.013 [39m[97m- at-most-one constraints : 91 cls
+[39m[90m0.013 [39m[97m- action constraints : 70 cls
+[39m[90m0.013 [39m[97m- action effects : 64 cls
+[39m[90m0.013 [39m[97m- at-least-one constraints : 6 cls
+[39m[90m0.013 [39m[97m- unclassified clauses : 38 cls
+[39m[90m0.013 [39m[97m* time grounding : 2 ms
+[39m[90m0.013 [39m[97m* time compute mutexes : 1 ms
+[39m[90m0.013 [39m[97m* time expansion : 1 ms
+[39m[90m0.013 [39m[97m* time encoding : 1 ms
+[39m[90m0.013 [39m[97m* time solver : 0 ms
+[39m[90m0.013 [39m[97m* time total : 13 ms
+[39m[90m0.013 [39m[97mExiting happily (no cleaning up).
+[39m

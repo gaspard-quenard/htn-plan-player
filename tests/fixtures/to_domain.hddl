@@ -1,0 +1,66 @@
+;; Small total-order HTN domain used by the viewer tests: a robot delivers
+;; packages one by one. It has recursion (deliver-all, goto), empty methods
+;; (already at the target, nothing left to deliver) and a universally
+;; quantified precondition (report-done), which planners often compile into
+;; extra action arguments.
+(define (domain delivery)
+  (:requirements :typing :hierarchy :negative-preconditions :universal-preconditions)
+  (:types robot package location - object)
+  (:predicates (at ?r - robot ?l - location) (pkg-at ?p - package ?l - location)
+               (carrying ?r - robot ?p - package) (delivered ?p - package)
+               (destination ?p - package ?l - location) (road ?a ?b - location)
+               (reported ?r - robot))
+
+  (:task deliver-all :parameters (?r - robot))
+  (:task deliver :parameters (?r - robot ?p - package))
+  (:task goto :parameters (?r - robot ?to - location))
+
+  (:method m-deliver-next
+    :parameters (?r - robot ?p - package)
+    :task (deliver-all ?r)
+    :precondition (not (delivered ?p))
+    :ordered-subtasks (and (deliver ?r ?p) (deliver-all ?r)))
+
+  (:method m-deliver-finished
+    :parameters (?r - robot)
+    :task (deliver-all ?r)
+    :ordered-subtasks (and (report-done ?r)))
+
+  (:method m-deliver
+    :parameters (?r - robot ?p - package ?src ?dst - location)
+    :task (deliver ?r ?p)
+    :precondition (and (pkg-at ?p ?src) (destination ?p ?dst))
+    :ordered-subtasks (and (goto ?r ?src) (pick-up ?r ?p ?src) (goto ?r ?dst) (drop ?r ?p ?dst)))
+
+  (:method m-goto-here
+    :parameters (?r - robot ?l - location)
+    :task (goto ?r ?l)
+    :precondition (at ?r ?l)
+    :subtasks ())
+
+  (:method m-goto-step
+    :parameters (?r - robot ?from ?mid ?to - location)
+    :task (goto ?r ?to)
+    :precondition (and (at ?r ?from) (road ?from ?mid))
+    :ordered-subtasks (and (move ?r ?from ?mid) (goto ?r ?to)))
+
+  (:action move
+    :parameters (?r - robot ?from ?to - location)
+    :precondition (and (at ?r ?from) (road ?from ?to))
+    :effect (and (not (at ?r ?from)) (at ?r ?to)))
+
+  (:action pick-up
+    :parameters (?r - robot ?p - package ?l - location)
+    :precondition (and (at ?r ?l) (pkg-at ?p ?l))
+    :effect (and (not (pkg-at ?p ?l)) (carrying ?r ?p)))
+
+  (:action drop
+    :parameters (?r - robot ?p - package ?l - location)
+    :precondition (and (at ?r ?l) (carrying ?r ?p) (destination ?p ?l))
+    :effect (and (not (carrying ?r ?p)) (pkg-at ?p ?l) (delivered ?p)))
+
+  (:action report-done
+    :parameters (?r - robot)
+    :precondition (forall (?p - package) (delivered ?p))
+    :effect (reported ?r))
+)

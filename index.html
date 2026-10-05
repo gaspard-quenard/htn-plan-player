@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HTN Plan Player</title>
+  <link rel="stylesheet" href="css/viewer.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand" title="HTN Plan Player">HTN <span>Plan Player</span></div>
+    <div class="files" id="files"></div>
+    <button id="btn-open" class="btn" title="Open plan, domain and problem files">Open…</button>
+    <button id="btn-paste" class="btn" title="Paste a plan, domain or problem">Paste…</button>
+    <button id="btn-close" class="btn" title="Close these files and go back to the start screen">Close</button>
+    <input type="file" id="file-input" multiple hidden>
+    <div class="spacer"></div>
+    <div class="search">
+      <input id="highlight" list="objects" placeholder="Highlight an object or name…" autocomplete="off" title="Highlight (/)">
+      <datalist id="objects"></datalist>
+      <span id="hl-count" class="hl-count"></span>
+      <button id="hl-clear" class="icon" title="Clear highlight (Esc)" hidden>✕</button>
+    </div>
+    <div class="seg" role="group" aria-label="Layout">
+      <button id="orient-lr" class="on" title="Root on the left, actions on the right (O)">⇢ Left→Right</button>
+      <button id="orient-td" title="Root at the top, actions at the bottom (O)">⇣ Top→Down</button>
+    </div>
+    <details class="menu">
+      <summary class="btn">View ▾</summary>
+      <div class="menu-body">
+        <label><input type="checkbox" id="opt-methods" checked> Show methods as separate boxes <kbd>M</kbd></label>
+        <label><input type="checkbox" id="opt-timeline" checked> Show the action timeline <kbd>T</kbd></label>
+        <label><input type="checkbox" id="opt-focus"> Focus on the active part (auto-collapse the rest)</label>
+        <label><input type="checkbox" id="opt-follow" checked> Follow the current action</label>
+        <label><input type="checkbox" id="opt-technical"> Show technical (planner-internal) actions</label>
+        <button id="btn-expand" class="btn">Expand everything</button>
+      </div>
+    </details>
+    <button id="btn-fit" class="btn" title="Fit the whole tree (F)">Fit</button>
+    <button id="btn-panel" class="btn" title="Show / hide the side panel">Panel</button>
+    <button id="btn-help" class="btn icon" title="Help (?)">?</button>
+  </header>
+
+  <main>
+    <section id="tree" class="tree">
+      <div class="legend" aria-label="Legend">
+        <span><i class="sw done"></i>Done</span>
+        <span><i class="sw active"></i>In progress</span>
+        <span><i class="sw now"></i>Executing</span>
+        <span><i class="sw future"></i>Upcoming</span>
+        <span class="shapes"><i class="sh task"></i>Task <i class="sh method"></i>Method <i class="sh action"></i>Action</span>
+      </div>
+      <div class="zoom">
+        <button id="zoom-in" class="btn icon" title="Zoom in">+</button>
+        <button id="zoom-out" class="btn icon" title="Zoom out">−</button>
+      </div>
+    </section>
+
+    <aside class="side">
+      <div class="tabs">
+        <button data-tab="details" class="on">Details</button>
+        <button data-tab="state">World state</button>
+      </div>
+      <div id="details" class="tab-body"></div>
+      <div id="state" class="tab-body" hidden></div>
+    </aside>
+
+    <div class="welcome">
+      <div class="welcome-card">
+        <h1>HTN Plan Player</h1>
+        <p class="lead">See how a hierarchical plan breaks a task down into actions, and play it step by step.</p>
+        <div class="dropzone">
+          <p><b>Drop your files here</b></p>
+          <p>The planner output (full log or plan, in the IPC format with <code>==&gt;</code> … <code>root</code> … <code>&lt;==</code>), and optionally the domain and problem <code>.hddl</code> files.</p>
+          <div class="welcome-actions">
+            <button id="w-open" class="btn primary">Choose files…</button>
+            <button id="w-paste" class="btn">Paste text…</button>
+          </div>
+          <div id="w-examples" class="welcome-actions examples">Or try an example:</div>
+        </div>
+        <p class="muted small"><button type="button" class="link" data-dialog="formats-dialog">Which files can I load?</button> · Everything runs in your browser. Files are never uploaded.</p>
+      </div>
+    </div>
+  </main>
+
+  <section id="timeline" class="timeline" aria-label="Actions in execution order"></section>
+
+  <footer class="bottom">
+    <div id="crumbs" class="crumbs" aria-label="Why this action: from the root task down to the current action"></div>
+    <div class="player">
+      <button id="p-first" class="btn icon" title="First step (Home)">⏮</button>
+      <button id="p-prev" class="btn icon" title="Previous step (←)">◀</button>
+      <button id="p-play" class="btn icon play" title="Play (Space)">▶</button>
+      <button id="p-next" class="btn icon" title="Next step (→)">▶|</button>
+      <button id="p-last" class="btn icon" title="End (End)">⏭</button>
+      <div class="scrub">
+        <div id="marks" class="marks"></div>
+        <input type="range" id="slider" min="0" max="0" value="0" aria-label="Step">
+      </div>
+      <div id="step-label" class="step-label"></div>
+      <label class="speed">Speed <select id="speed"></select></label>
+    </div>
+  </footer>
+
+  <div class="drop-overlay"><div>Drop plan / domain / problem files</div></div>
+  <div id="toast" class="toast" hidden></div>
+
+  <dialog id="paste-dialog">
+    <form method="dialog">
+      <h3>Paste a plan, a domain or a problem</h3>
+      <p class="muted small">The type is detected automatically. Paste each file separately. <button type="button" class="link" data-dialog="formats-dialog">Accepted formats</button></p>
+      <textarea id="paste-text" rows="16" spellcheck="false" placeholder="==>&#10;1 action arg1 arg2&#10;…&#10;root 5&#10;5 task arg -> method 1 2&#10;<=="></textarea>
+      <div class="dialog-actions">
+        <button class="btn" value="cancel">Cancel</button>
+        <button id="paste-load" class="btn primary" value="ok">Load</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="formats-dialog" class="formats">
+    <form method="dialog">
+      <h3>Files you can load</h3>
+      <p class="muted small">Files are recognised by their content: names and extensions do not matter. Load them together or one by one.</p>
+
+      <h4>Plan (required)</h4>
+      <p>The output of an HTN planner in the hierarchical plan format of the International Planning Competition (IPC 2020). The whole planner log is fine: the viewer reads the last block between <code>==&gt;</code> and <code>&lt;==</code>.</p>
+      <pre>==&gt;
+1 pick-up r1 p1 depot
+2 move r1 depot a
+root 10
+10 deliver-all r1 -&gt; m-deliver-next 11 12
+11 deliver r1 p1 -&gt; m-deliver 1 2
+12 deliver-all r1 -&gt; m-deliver-finished
+&lt;==</pre>
+      <ul>
+        <li><code>id action arguments</code>: the actions, in execution order.</li>
+        <li><code>root ids</code>: the initial task(s) of the problem.</li>
+        <li><code>id task arguments -&gt; method subtask-ids</code>: how each abstract task was decomposed. A method with no subtask ids (as <code>m-deliver-finished</code> above) is an empty decomposition.</li>
+      </ul>
+      <p>Partial-order plans use the same format: their actions may interleave between subtasks.</p>
+
+      <h4>Durations and parallel actions (optional)</h4>
+      <p>End each action line with its <b>start</b> and <b>end</b> times, two integers with end &gt; start:</p>
+      <pre>==&gt;
+1 grind arabica 0 1
+2 brew arabica cup1 1 4
+3 slice bread1 1 2
+4 toast bread1 2 3
+root 10
+…</pre>
+      <ul>
+        <li>Here <code>brew</code> lasts 3 time units, and <code>slice</code> then <code>toast</code> run during it.</li>
+        <li>Either every action has times, or none does. Without times, actions run one after the other, one time unit each.</li>
+        <li>An action's preconditions are checked when it starts; its effects are applied when it ends. When actions end and others start at the same time, the effects come first.</li>
+      </ul>
+
+      <h4>Domain and problem (optional)</h4>
+      <p>HDDL files, as in the IPC hierarchical tracks. They add the definitions, the checks and the world state. Supported:</p>
+      <ul>
+        <li>types, constants, objects, initial state, goal, initial task network;</li>
+        <li>tasks; methods with totally or partially ordered subtasks, preconditions and constraints;</li>
+        <li>actions with negative, disjunctive (<code>or</code>, <code>imply</code>), quantified (<code>forall</code>, <code>exists</code>) and equality preconditions, and conditional (<code>when</code>) and quantified effects.</li>
+      </ul>
+      <p class="muted small">Numeric fluents and durative actions in the domain are not supported yet.</p>
+      <div class="dialog-actions"><button class="btn primary" value="ok">Close</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="help-dialog">
+    <form method="dialog">
+      <h3>Reading an HTN plan</h3>
+      <p>A hierarchical plan is a <b>tree</b>. The root is the task the problem asks for. An <b>abstract task</b> (rounded box) is something to achieve, a <b>method</b> (small pill) is one way to break that task into smaller subtasks, and an <b>action</b> (box with a bar) is a step that is really executed.</p>
+      <p>Press play: the action executed now is <span class="chip st-now">blue</span>, every task and method it belongs to is <span class="chip st-active">orange</span>, finished parts are <span class="chip st-done">green</span>, upcoming ones are <span class="chip st-future">grey</span>. The bar above the player reads the path from the root to the current action: it explains <i>why</i> the action is executed.</p>
+      <p>In a partial-order plan, several branches can be in progress at the same time: their actions are interleaved.</p>
+      <p><button type="button" class="link" data-dialog="formats-dialog">Accepted file formats (plan, durations, domain, problem)</button></p>
+      <h4>Mouse</h4>
+      <ul>
+        <li>Click a box to see its definition, its preconditions (✓ / ✗ in the current state) and its effects.</li>
+        <li>Click an object name (a robot, a package, a location…) to highlight everything that involves it.</li>
+        <li>Double-click a box, or click its <code>+N</code> badge, to collapse / expand it.</li>
+        <li>Drag to move, wheel to zoom.</li>
+        <li>The timeline under the tree lists the actions in execution order: click one to jump to it.</li>
+      </ul>
+      <h4>Keyboard</h4>
+      <table class="keys">
+        <tr><td><kbd>Space</kbd></td><td>play / pause</td><td><kbd>←</kbd> <kbd>→</kbd></td><td>previous / next step (<kbd>Shift</kbd>: 10 steps)</td></tr>
+        <tr><td><kbd>Home</kbd> <kbd>End</kbd></td><td>first / last step</td><td><kbd>C</kbd></td><td>centre on the current action</td></tr>
+        <tr><td><kbd>F</kbd></td><td>fit the tree</td><td><kbd>O</kbd></td><td>switch orientation</td></tr>
+        <tr><td><kbd>M</kbd></td><td>methods as boxes</td><td><kbd>T</kbd></td><td>action timeline</td></tr>
+        <tr><td><kbd>/</kbd></td><td>highlight…</td><td></td><td></td></tr>
+        <tr><td><kbd>Esc</kbd></td><td>clear selection</td><td><kbd>?</kbd></td><td>this help</td></tr>
+      </table>
+      <div class="dialog-actions"><button class="btn primary" value="ok">Close</button></div>
+    </form>
+  </dialog>
+
+  <!-- Classic scripts (not modules) so that the page also works when opened from disk. -->
+  <script src="js/core/sexpr.js"></script>
+  <script src="js/core/hddl.js"></script>
+  <script src="js/core/plan.js"></script>
+  <script src="js/core/schedule.js"></script>
+  <script src="js/core/state.js"></script>
+  <script src="js/core/bind.js"></script>
+  <script src="js/core/model.js"></script>
+  <script src="js/view/dom.js"></script>
+  <script src="js/view/layout.js"></script>
+  <script src="js/view/tree.js"></script>
+  <script src="js/view/player.js"></script>
+  <script src="js/view/timeline.js"></script>
+  <script src="js/view/panels.js"></script>
+  <script src="js/example.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
