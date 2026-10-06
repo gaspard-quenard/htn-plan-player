@@ -52,6 +52,9 @@ With the domain and problem you also get:
   - a goal that does not hold;
   - subtasks that do not match their method.
 
+When an action is selected, the details follow the action being executed as the plan
+plays or steps; a selected task or method stays selected.
+
 Press `?` in the viewer for the help and keyboard shortcuts.
 
 When the folder is hosted, a view can be shared with URL parameters:

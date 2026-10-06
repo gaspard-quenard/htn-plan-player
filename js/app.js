@@ -113,9 +113,15 @@
   function setStep(k, animate = true) {
     if (!S.model) return;
     S.step = Math.max(0, Math.min(stepCount(), k));
+    // A selected action follows the plan: the details show the action being
+    // executed (a selected task or method stays, to be examined while playing).
+    const current = currentActions();
+    if (S.selected && S.selected.kind === 'action' && current.length && !current.includes(S.selected)) {
+      S.selected = current[0];
+    }
     if (S.focus) relayout(animate); else refreshClasses(animate);
     renderPanels();
-    const cur = currentActions()[0];
+    const cur = current[0];
     const target = cur && visibleAncestor(cur);
     if (S.follow && target) tree.focusNode(target.id, { onlyIfOutside: !S.focus, animate });
   }

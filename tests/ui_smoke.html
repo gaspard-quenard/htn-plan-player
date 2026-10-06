@@ -58,10 +58,16 @@
         click(d.querySelector('g.n[data-id="79"] .box'));
         check($('#details .d-title').textContent === 'drop', 'click selects a node');
         check(/carrying r1 p1/.test($('#details').textContent), 'details show grounded precondition');
+        key('Home');
+        check($('#details .d-title').textContent === 'pick-up', 'a selected action follows the current step (Home)');
+        key('ArrowRight');
+        check($('#details .d-title').textContent === 'move' && d.querySelector('g.n.sel.current'), 'a selected action follows the current step (next)');
         click(d.querySelector('g.n[data-id="14/m"] .box'));
         check(d.querySelectorAll('#details .order-svg g.ord').length === 4 && d.querySelectorAll('#details .ord-edge').length === 3, 'ordering diagram: 4 subtasks in a chain');
         click(d.querySelector('#details .order-svg g.ord.clickable'));
         check($('#details .d-title').textContent === 'goto', 'clicking a box in the ordering diagram selects the subtask');
+        key('ArrowRight');
+        check($('#details .d-title').textContent === 'goto', 'a selected task stays selected when stepping');
 
         click(d.querySelector('g.n[data-id="199"] tspan.arg[data-obj="p2"]'));
         check($('#highlight').value === 'p2' && /match/.test($('#hl-count').textContent), 'clicking an argument highlights the object (' + $('#hl-count').textContent + ')');
